@@ -88,4 +88,19 @@ class Common extends REST_Controller
         );
         $this->response($data, 200);
     }
+
+    public function myProperties_get()
+    {
+        $user_id = $this->checkAuth()['user_id'];
+
+        $sql = "Select p.property_id, p.banner_img, p.property_name, p.property_type, p.area_name, p.ct_id, ct.ct_name, case when p.contact_for_price then 'contact for price' when lower(p.price_type)='fixed' then p.fixed_price when lower(p.price_type)='range' then concat(p.min_price, 'to', p.max_price) else 'contact for price' end as price, p.brokarage, p.prop_status, case when p.property_type='APARTMENT' then c1.apartment_config when p.property_type like '%HOUSE%' then c1.house_config else 'NA' end as config from properties p inner join ctowns as ct on p.posted_by=$user_id and p.ct_id=ct.ct_id left join (select property_id, concat(group_concat(bhk_type), ' BHK Apartments') as apartment_config, concat(bhk_type, ' Bed | ', bathrooms, ' Bath | ', case when super_builtup_area is not null then super_builtup_area when builtup_area is not null then builtup_area when carpet_area is not null then carpet_area else 'NA' end) as house_config from flats_config group by property_id) as c1 on p.property_id=c1.property_id";
+        $data1 = $this->common_api_model->execute_raw_sql($sql);
+
+        $data = array(
+            'status' => 200,
+            "message" => "My Properties List.",
+            "properties_list" => $data1
+        );
+        $this->response($data, 200);
+    }
 }
