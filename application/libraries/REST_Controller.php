@@ -2211,4 +2211,41 @@ abstract class REST_Controller extends \CI_Controller
 
         return $data;
     }
+
+    public function file_upload($file, $folder_name = '')
+    {
+        $_FILES['file']['name'] = $file['name'];
+        $_FILES['file']['type'] = $file['type'];
+        $_FILES['file']['tmp_name'] = $file['tmp_name'];
+        $_FILES['file']['size'] = $file['size'];
+        $_FILES['file']['error'] = $file['error'];
+        if (!empty($folder_name)) {
+            $path = 'uploads/' . trim($folder_name) . '/';
+        } else {
+            $path = 'uploads/';
+        }
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+        $config['upload_path'] = $path;
+        $config['allowed_types'] = 'jpg|png|pdf|svg|jpeg';
+        $config['max_size'] = 10200;
+        $config['max_width'] = 0;
+        $config['max_height'] = 0;
+        $config['encrypt_name'] = TRUE;
+        $this->load->library('upload', $config);
+
+        if (!$this->upload->do_upload('file')) {
+            $err = $this->upload->display_errors();
+            $data = array(
+                'status' => "invalid",
+                "message" => $err,
+                "data" => array(),
+            );
+            echo json_encode($data, JSON_PRETTY_PRINT);
+            exit;
+        } else {
+            return $path . $this->upload->data('file_name');
+        }
+    }
 }

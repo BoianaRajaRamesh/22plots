@@ -1,6 +1,7 @@
 <?php
 
-function file_upload($folder_name, $file) {
+function file_upload($folder_name, $file)
+{
     if (!is_dir('uploads/' . trim($folder_name))) {
         mkdir('uploads/' . trim($folder_name), 0777, true);
     }
