@@ -201,4 +201,28 @@ class Users extends REST_Controller
             $this->response($data, REST_Controller::HTTP_BAD_REQUEST);
         }
     }
+
+    public function saveUserLog_get()
+    {
+        $user_id = $this->checkAuth()['user_id'];
+        $data = [
+            'user_id' => $user_id,
+            'visited_on' => CURRENT_DATE_TIME
+        ];
+        $inserid = $this->common_api_model->add_data("daily_users", $data);
+        if ($inserid) {
+            $data = array(
+                'status' => 200,
+                "message" => "User log added successfully.",
+                "log_id" => $inserid
+            );
+            $this->response($data, REST_Controller::HTTP_OK);
+        } else {
+            $data = array(
+                'status' => 404,
+                "message" => "User log adding failed."
+            );
+            $this->response($data, REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
 }

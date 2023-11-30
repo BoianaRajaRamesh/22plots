@@ -54,6 +54,7 @@ $route['admin'] = 'admin/login';
 $route['resendOtp'] = 'users/resendOtp';
 $route['validateOtp'] = 'users/validateOtp';
 $route['userDetails'] = 'users/userDetails';
+$route['saveUserLog'] = 'users/saveUserLog';
 $route['updateUserDetails'] = 'users/updateUserDetails';
 $route['homePage'] = 'common/homePage';
 $route['myContactedProperties'] = 'common/myContactedProperties';

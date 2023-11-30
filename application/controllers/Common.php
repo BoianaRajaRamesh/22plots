@@ -34,8 +34,8 @@ class Common extends REST_Controller
         $data = array(
             'status' => 200,
             "message" => "Home Page Details.",
-            "home_list" => $data1,
-            "house_list" => $data2,
+            "home" => $data1,
+            "home_properties" => $data2,
         );
         $this->response($data, 200);
     }
