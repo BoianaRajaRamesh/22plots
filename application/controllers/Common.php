@@ -103,4 +103,21 @@ class Common extends REST_Controller
         );
         $this->response($data, 200);
     }
+
+    public function developerProfile_post()
+    {
+        $this->checkAuth();
+
+        if (empty($this->post('company_id'))) {
+            $this->throw_error('company id required');
+        }
+        $company_id = $this->post('company_id');
+        $details = $this->common_api_model->get_record('company_info', "id = $company_id");
+        $data = array(
+            'status' => 200,
+            "message" => "Developer Profile Details.",
+            "details" => $details
+        );
+        $this->response($data, 200);
+    }
 }

@@ -60,5 +60,7 @@ $route['myContactedProperties'] = 'common/myContactedProperties';
 $route['viewedProperties'] = 'common/viewedProperties';
 $route['wishlist'] = 'common/wishlist';
 $route['myProperties'] = 'common/myProperties';
+$route['searchProperty'] = 'property/searchProperty';
+$route['developerProfile'] = 'common/developerProfile';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
