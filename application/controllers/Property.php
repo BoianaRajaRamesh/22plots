@@ -197,7 +197,7 @@ class Property extends REST_Controller
         } else {
             $data = array(
                 'status' => 404,
-                "message" => "Apartment not added."
+                "message" => "Apartment adding failed."
             );
             $this->response($data, 404);
         }
@@ -251,7 +251,7 @@ class Property extends REST_Controller
         ];
 
         foreach ($apartmentData as $field => $value) {
-            if ($field != 'verification_status' && $field != 'total_area' && $field != 'cost_sheet' && $field != 'uds' && $field != 'distance_from_main_road' && $field != 'brochure') {
+            if ($field != 'total_area' && $field != 'cost_sheet' && $field != 'uds' && $field != 'distance_from_main_road' && $field != 'brochure') {
                 if (empty($value)) {
                     $this->throw_error("$field is required", 400);
                 }
@@ -341,7 +341,7 @@ class Property extends REST_Controller
         } else {
             $data = array(
                 'status' => 404,
-                "message" => "House not added."
+                "message" => "House adding failed."
             );
             $this->response($data, 404);
         }
@@ -394,7 +394,7 @@ class Property extends REST_Controller
         ];
 
         foreach ($apartmentData as $field => $value) {
-            if ($field != 'verification_status' && $field != 'total_area' && $field != 'cost_sheet' && $field != 'uds' && $field != 'distance_from_main_road' && $field != 'brochure') {
+            if ($field != 'total_area' && $field != 'cost_sheet' && $field != 'distance_from_main_road' && $field != 'brochure') {
                 if (empty($value)) {
                     $this->throw_error("$field is required", 400);
                 }
@@ -462,7 +462,225 @@ class Property extends REST_Controller
         } else {
             $data = array(
                 'status' => 404,
-                "message" => "Venture not added."
+                "message" => "Venture adding failed."
+            );
+            $this->response($data, 404);
+        }
+    }
+
+
+    public function saveIndependentPlot_post()
+    {
+        $this->checkAuth();
+
+        $apartmentData = [
+            'posted_by' => $this->post('posted_by'),
+            'prop_purpose' => $this->post('prop_purpose'),
+            'ct_id' => $this->post('ct_id'),
+            'area_name' => $this->post('area_name'),
+            'user_type' => $this->post('user_type'),
+            'property_name' => $this->post('property_name'),
+            'description' => $this->post('description'),
+            'address' => $this->post('address'),
+            'landmark' => $this->post('landmark'),
+            'facing' => $this->post('facing'),
+            'road_width' => $this->post('road_width'),
+            'govt_approval' => $this->post('govt_approval'),
+            'approvals' => $this->post('approvals'),
+            'contact_for_price' => $this->post('contact_for_price'),
+            'price_type' => $this->post('price_type'),
+            'fixed_price' => $this->post('fixed_price'),
+            'min_price' => $this->post('min_price'),
+            'max_price' => $this->post('max_price'),
+            'negotiable' => $this->post('negotiable'),
+            'brokarage' => $this->post('brokerage'),
+            'loan_availability' => $this->post('loan_availability'),
+            'distance_from_main_road' => $this->post('distance_from_main_road'),
+            'latitude' => $this->post('latitude'),
+            'longitude' => $this->post('longitude'),
+            'location_advantages' => $this->post('location_advantages'),
+            'amenities' => $this->post('amenities'),
+            'video' => $this->post('video'),
+            'comp_id' => $this->post('company_id'),
+            'msg' => $this->post('msg'),
+            'need_help' => $this->post('need_help'),
+            'prop_status' => $this->post('prop_status'),
+            'updated_on' => CURRENT_DATE_TIME,
+            'added_on' => CURRENT_DATE_TIME
+        ];
+
+        foreach ($apartmentData as $field => $value) {
+            if ($field != 'distance_from_main_road') {
+                if (empty($value)) {
+                    $this->throw_error("$field is required", 400);
+                }
+            }
+
+            if ($field == 'govt_approval' || $field == 'contact_for_price' || $field == 'negotiable' || $field == 'brokerage' || $field == 'loan_availability' || $field == 'need_help') {
+                if (strtolower($value) != 'true' && strtolower($value) != 'false') {
+                    $this->throw_error("$field must be boolen", 400);
+                }
+                if (strtolower($value) == 'true') {
+                    $apartmentData[$field] = 1;
+                } else {
+                    $apartmentData[$field] = 0;
+                }
+            }
+        }
+        $flats_config = $this->post('plots_config');
+
+        if (isset($_FILES['banner_img']['name'])) {
+            $banner_img = $this->file_upload($_FILES['banner_img'], 'property_banner');
+        } else {
+            $this->throw_error("$field is required", 400);
+        }
+        $apartmentData['banner_img'] = $banner_img;
+        $apartmentData['verification_status'] = 0;
+        $apartmentData['property_type'] = 'PLOT';
+
+        $image_paths = [];
+
+        for ($i = 0; $i < count($_FILES['photos']['name']); $i++) {
+            $image['name'] = $_FILES['photos']['name'][$i];
+            $image['type'] = $_FILES['photos']['type'][$i];
+            $image['tmp_name'] = $_FILES['photos']['tmp_name'][$i];
+            $image['size'] = $_FILES['photos']['size'][$i];
+            $image['error'] = $_FILES['photos']['error'][$i];
+
+            $image_paths[] = $this->file_upload($image, 'properties');
+        }
+
+        $last_id = $this->common_api_model->add_data('properties', $apartmentData);
+        if ($last_id) {
+            foreach ($image_paths as $image) {
+                $img_data = array(
+                    "property_id" => $last_id,
+                    "image_url" => $image
+                );
+                $this->common_api_model->add_data('property_images', $img_data);
+            }
+            foreach ($flats_config as $key => $row) {
+                $flat_config_data = array(
+                    "property_id" => $last_id,
+                    "width" => $row['width'],
+                    "length" => $row['length'],
+                    "facing" => $row['facing'],
+                    "square_yards" => $row['square_yards'],
+                    "price" => $row['price']
+                );
+                $this->common_api_model->add_data('plots_config', $flat_config_data);
+            }
+            $data = array(
+                'status' => 201,
+                "message" => "Independent Plot added successfully."
+            );
+            $this->response($data, 201);
+        } else {
+            $data = array(
+                'status' => 404,
+                "message" => "Independent Plot adding failed."
+            );
+            $this->response($data, 404);
+        }
+    }
+
+    public function saveLand_post()
+    {
+        $this->checkAuth();
+
+        $apartmentData = [
+            'posted_by' => $this->post('posted_by'),
+            'prop_purpose' => $this->post('prop_purpose'),
+            'ct_id' => $this->post('ct_id'),
+            'area_name' => $this->post('area_name'),
+            'user_type' => $this->post('user_type'),
+            'property_name' => $this->post('property_name'),
+            'description' => $this->post('description'),
+            'address' => $this->post('address'),
+            'landmark' => $this->post('landmark'),
+            'current_status' => $this->post('current_status'),
+            'total_area' => $this->post('total_area'),
+            'road_width' => $this->post('road_width'),
+            'contact_for_price' => $this->post('contact_for_price'),
+            'price_type' => $this->post('price_type'),
+            'fixed_price' => $this->post('fixed_price'),
+            'min_price' => $this->post('min_price'),
+            'max_price' => $this->post('max_price'),
+            'negotiable' => $this->post('negotiable'),
+            'brokarage' => $this->post('brokerage'),
+            'loan_availability' => $this->post('loan_availability'),
+            'distance_from_main_road' => $this->post('distance_from_main_road'),
+            'latitude' => $this->post('latitude'),
+            'longitude' => $this->post('longitude'),
+            'location_advantages' => $this->post('location_advantages'),
+            'amenities' => $this->post('amenities'),
+            'banner_img' => $this->post('banner_img'),
+            'video' => $this->post('video'),
+            'comp_id' => $this->post('company_id'),
+            'msg' => $this->post('msg'),
+            'need_help' => $this->post('need_help'),
+            'prop_status' => $this->post('prop_status'),
+            'updated_on' => CURRENT_DATE_TIME,
+            'added_on' => CURRENT_DATE_TIME
+        ];
+
+        foreach ($apartmentData as $field => $value) {
+            if ($field != 'distance_from_main_road' && $field != 'comp_id' && $field != 'video') {
+                if (empty($value)) {
+                    $this->throw_error("$field is required", 400);
+                }
+            }
+
+            if ($field == 'contact_for_price' || $field == 'negotiable' || $field == 'brokerage' || $field == 'loan_availability' || $field == 'need_help') {
+                if (strtolower($value) != 'true' && strtolower($value) != 'false') {
+                    $this->throw_error("$field must be boolen", 400);
+                }
+                if (strtolower($value) == 'true') {
+                    $apartmentData[$field] = 1;
+                } else {
+                    $apartmentData[$field] = 0;
+                }
+            }
+        }
+        if (isset($_FILES['banner_img']['name'])) {
+            $banner_img = $this->file_upload($_FILES['banner_img'], 'property_banner');
+        } else {
+            $this->throw_error("$field is required", 400);
+        }
+        $apartmentData['banner_img'] = $banner_img;
+        $apartmentData['verification_status'] = 0;
+        $apartmentData['property_type'] = 'LAND';
+
+        $image_paths = [];
+
+        for ($i = 0; $i < count($_FILES['photos']['name']); $i++) {
+            $image['name'] = $_FILES['photos']['name'][$i];
+            $image['type'] = $_FILES['photos']['type'][$i];
+            $image['tmp_name'] = $_FILES['photos']['tmp_name'][$i];
+            $image['size'] = $_FILES['photos']['size'][$i];
+            $image['error'] = $_FILES['photos']['error'][$i];
+
+            $image_paths[] = $this->file_upload($image, 'properties');
+        }
+
+        $last_id = $this->common_api_model->add_data('properties', $apartmentData);
+        if ($last_id) {
+            foreach ($image_paths as $image) {
+                $img_data = array(
+                    "property_id" => $last_id,
+                    "image_url" => $image
+                );
+                $this->common_api_model->add_data('property_images', $img_data);
+            }
+            $data = array(
+                'status' => 201,
+                "message" => "Land added successfully."
+            );
+            $this->response($data, 201);
+        } else {
+            $data = array(
+                'status' => 404,
+                "message" => "Land adding failed."
             );
             $this->response($data, 404);
         }

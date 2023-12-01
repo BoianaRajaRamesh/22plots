@@ -66,5 +66,7 @@ $route['developerProfile'] = 'common/developerProfile';
 $route['saveApartment'] = 'property/saveApartment';
 $route['saveIndependentHouse'] = 'property/saveIndependentHouse';
 $route['saveVenture'] = 'property/saveVenture';
+$route['saveIndependentPlot'] = 'property/saveIndependentPlot';
+$route['saveLand'] = 'property/saveLand';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
