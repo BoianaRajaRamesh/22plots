@@ -2233,10 +2233,14 @@ abstract class REST_Controller extends \CI_Controller
         $config['max_width'] = 0;
         $config['max_height'] = 0;
         $config['encrypt_name'] = TRUE;
+        $config['file_ext_tolower'] = TRUE;
+        $config['remove_spaces'] = TRUE;
+
         $this->load->library('upload', $config);
 
         if (!$this->upload->do_upload('file')) {
             $err = $this->upload->display_errors();
+            unset($this->upload);
             $data = array(
                 'status' => "invalid",
                 "message" => $err,
@@ -2245,7 +2249,9 @@ abstract class REST_Controller extends \CI_Controller
             echo json_encode($data, JSON_PRETTY_PRINT);
             exit;
         } else {
-            return $path . $this->upload->data('file_name');
+            $file_name = $path . $this->upload->data('file_name');
+            unset($this->upload);
+            return $file_name;
         }
     }
 }
