@@ -685,4 +685,81 @@ class Property extends REST_Controller
             $this->response($data, 404);
         }
     }
+
+    public function updatePropertyStatus_post()
+    {
+        $this->checkAuth();
+        if (empty($this->post('property_id'))) {
+            $this->throw_error('property id required');
+        }
+        if (empty($this->post('prop_status'))) {
+            $this->throw_error('property status required');
+        }
+        $property_id = $this->post('property_id');
+        $prop_status = $this->post('prop_status');
+
+        $data = array(
+            'prop_status' => $prop_status,
+            'updated_on' => CURRENT_DATE_TIME
+        );
+        $condition = "property_id=$property_id";
+        $updateStatus = $this->common_api_model->update_data('properties', $data, $condition);
+        if ($updateStatus) {
+            $data = array(
+                'status' => 201,
+                "message" => "Property status updated successfully."
+            );
+            $this->response($data, 201);
+        } else {
+            $data = array(
+                'status' => 404,
+                "message" => "Status update failed."
+            );
+            $this->response($data, 404);
+        }
+    }
+
+    public function propertyDetailsByCt_post()
+    {
+        $this->checkAuth();
+        if (empty($this->post('ct_id'))) {
+            $this->throw_error('ct id required');
+        }
+        if (empty($this->post('property_type'))) {
+            $this->throw_error('property type required');
+        }
+        $ct_id = $this->post('ct_id');
+        $property_type = $this->post('property_type');
+
+        $sql = "select property_type, p.property_id, p.latitude, p.longitude, case when lower(p.price_type)='fixed' then p.fixed_price when lower(p.price_type)='range' then concat(p.min_price, '-', p.max_price) end as price from properties p where p.ct_id=$ct_id and p.prop_purpose='SELL' and p.prop_status='OPEN' and !(p.contact_for_price) and property_type like '%$property_type%'";
+        $properties = $this->common_api_model->execute_raw_sql($sql);
+        $data = array(
+            'status' => 200,
+            "message" => "Properties list.",
+            'properties' => $properties
+        );
+        $this->response($data, 200);
+    }
+
+    public function propertyDetailsById_post()
+    {
+        $this->checkAuth();
+        if (empty($this->post('property_id'))) {
+            $this->throw_error('property id required');
+        }
+        if (empty($this->post('property_type'))) {
+            $this->throw_error('property type required');
+        }
+        $property_type = $this->post('property_type');
+        $property_id = $this->post('property_id');
+        $properties = [];
+        // $sql = "select property_type, p.property_id, p.latitude, p.longitude, case when lower(p.price_type)='fixed' then p.fixed_price when lower(p.price_type)='range' then concat(p.min_price, '-', p.max_price) end as price from properties p where p.ct_id=$ct_id and p.prop_purpose='SELL' and p.prop_status='OPEN' and !(p.contact_for_price) and property_type like '%$property_type%'";
+        // $properties = $this->common_api_model->execute_raw_sql($sql);
+        $data = array(
+            'status' => 200,
+            "message" => "Properties list.",
+            'properties' => $properties
+        );
+        $this->response($data, 200);
+    }
 }

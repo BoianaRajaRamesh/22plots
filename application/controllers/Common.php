@@ -120,4 +120,96 @@ class Common extends REST_Controller
         );
         $this->response($data, 200);
     }
+
+    public function addToWishlist_post()
+    {
+        $user_id = $this->checkAuth()['user_id'];
+        if (empty($this->post('property_id'))) {
+            $this->throw_error('property id required');
+        }
+        if (empty($this->post('property_type'))) {
+            $this->throw_error('property type required');
+        }
+        $property_id = $this->post('property_id');
+        $property_type = $this->post('property_type');
+
+        $wishlist = array(
+            'user_id' => $user_id,
+            'property_id' => $property_id,
+            'property_type' => $property_type,
+            'wishlisted_on' => CURRENT_DATE_TIME
+        );
+        $inserid = $this->common_api_model->add_data("prop_wishlist", $wishlist);
+        if ($inserid) {
+            $data = array(
+                'status' => 201,
+                "message" => "Property added to wishlist successfully."
+            );
+            $this->response($data, 201);
+        } else {
+            $data = array(
+                'status' => 404,
+                "message" => "Wishlist adding failed."
+            );
+            $this->response($data, 404);
+        }
+    }
+
+    public function savePropertyView_post()
+    {
+        $user_id = $this->checkAuth()['user_id'];
+        if (empty($this->post('property_id'))) {
+            $this->throw_error('property id required');
+        }
+        $property_id = $this->post('property_id');
+
+        $wishlist = array(
+            'user_id' => $user_id,
+            'property_id' => $property_id,
+            'viewed_on' => CURRENT_DATE_TIME
+        );
+        $inserid = $this->common_api_model->add_data("property_views", $wishlist);
+        if ($inserid) {
+            $data = array(
+                'status' => 201,
+                "message" => "Added view count successfully."
+            );
+            $this->response($data, 201);
+        } else {
+            $data = array(
+                'status' => 404,
+                "message" => "Adding failed."
+            );
+            $this->response($data, 404);
+        }
+    }
+
+    public function savePropertyCallHistory_post()
+    {
+        $user_id = $this->checkAuth()['user_id'];
+        if (empty($this->post('property_id'))) {
+            $this->throw_error('property id required');
+        }
+        $property_id = $this->post('property_id');
+
+        $call_history = array(
+            'user_id' => $user_id,
+            'property_id' => $property_id,
+            'called_on' => CURRENT_DATE_TIME
+        );
+        $inserid = $this->common_api_model->add_data("call_history", $call_history);
+        if ($inserid) {
+            $data = array(
+                'status' => 201,
+                "message" => "Property call history saved successfully."
+            );
+            $this->response($data, 201);
+        } else {
+            $data = array(
+                'status' => 404,
+                "message" => "Adding failed."
+            );
+            $this->response($data, 404);
+        }
+    }
 }
