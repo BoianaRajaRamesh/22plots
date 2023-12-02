@@ -132,26 +132,35 @@ class Common extends REST_Controller
         }
         $property_id = $this->post('property_id');
         $property_type = $this->post('property_type');
-
-        $wishlist = array(
-            'user_id' => $user_id,
-            'property_id' => $property_id,
-            'property_type' => $property_type,
-            'wishlisted_on' => CURRENT_DATE_TIME
-        );
-        $inserid = $this->common_api_model->add_data("prop_wishlist", $wishlist);
-        if ($inserid) {
+        $cond = "user_id = $user_id and property_id = $property_id and property_type = '$property_type'";
+        $old_record = $this->common_api_model->get_record("prop_wishlist", $cond);
+        if ($old_record) {
             $data = array(
                 'status' => 201,
-                "message" => "Property added to wishlist successfully."
+                "message" => "Property already there in your wishlist."
             );
             $this->response($data, 201);
         } else {
-            $data = array(
-                'status' => 404,
-                "message" => "Wishlist adding failed."
+            $wishlist = array(
+                'user_id' => $user_id,
+                'property_id' => $property_id,
+                'property_type' => $property_type,
+                'wishlisted_on' => CURRENT_DATE_TIME
             );
-            $this->response($data, 404);
+            $inserid = $this->common_api_model->add_data("prop_wishlist", $wishlist);
+            if ($inserid) {
+                $data = array(
+                    'status' => 201,
+                    "message" => "Property added to wishlist successfully."
+                );
+                $this->response($data, 201);
+            } else {
+                $data = array(
+                    'status' => 404,
+                    "message" => "Wishlist adding failed."
+                );
+                $this->response($data, 404);
+            }
         }
     }
 
@@ -162,25 +171,34 @@ class Common extends REST_Controller
             $this->throw_error('property id required');
         }
         $property_id = $this->post('property_id');
-
-        $wishlist = array(
-            'user_id' => $user_id,
-            'property_id' => $property_id,
-            'viewed_on' => CURRENT_DATE_TIME
-        );
-        $inserid = $this->common_api_model->add_data("property_views", $wishlist);
-        if ($inserid) {
+        $cond = "user_id = $user_id and property_id = $property_id";
+        $old_record = $this->common_api_model->get_record("property_views", $cond);
+        if ($old_record) {
             $data = array(
                 'status' => 201,
-                "message" => "Added view count successfully."
+                "message" => "Property already added in your view list."
             );
             $this->response($data, 201);
         } else {
-            $data = array(
-                'status' => 404,
-                "message" => "Adding failed."
+            $wishlist = array(
+                'user_id' => $user_id,
+                'property_id' => $property_id,
+                'viewed_on' => CURRENT_DATE_TIME
             );
-            $this->response($data, 404);
+            $inserid = $this->common_api_model->add_data("property_views", $wishlist);
+            if ($inserid) {
+                $data = array(
+                    'status' => 201,
+                    "message" => "Added to your view list successfully."
+                );
+                $this->response($data, 201);
+            } else {
+                $data = array(
+                    'status' => 404,
+                    "message" => "Adding failed."
+                );
+                $this->response($data, 404);
+            }
         }
     }
 
@@ -191,25 +209,34 @@ class Common extends REST_Controller
             $this->throw_error('property id required');
         }
         $property_id = $this->post('property_id');
-
-        $call_history = array(
-            'user_id' => $user_id,
-            'property_id' => $property_id,
-            'called_on' => CURRENT_DATE_TIME
-        );
-        $inserid = $this->common_api_model->add_data("call_history", $call_history);
-        if ($inserid) {
+        $cond = "user_id = $user_id and property_id = $property_id";
+        $old_record = $this->common_api_model->get_record("call_history", $cond);
+        if ($old_record) {
             $data = array(
                 'status' => 201,
-                "message" => "Property call history saved successfully."
+                "message" => "Property already added in your call history."
             );
             $this->response($data, 201);
         } else {
-            $data = array(
-                'status' => 404,
-                "message" => "Adding failed."
+            $call_history = array(
+                'user_id' => $user_id,
+                'property_id' => $property_id,
+                'called_on' => CURRENT_DATE_TIME
             );
-            $this->response($data, 404);
+            $inserid = $this->common_api_model->add_data("call_history", $call_history);
+            if ($inserid) {
+                $data = array(
+                    'status' => 201,
+                    "message" => "Property call history saved successfully."
+                );
+                $this->response($data, 201);
+            } else {
+                $data = array(
+                    'status' => 404,
+                    "message" => "Adding failed."
+                );
+                $this->response($data, 404);
+            }
         }
     }
 }
