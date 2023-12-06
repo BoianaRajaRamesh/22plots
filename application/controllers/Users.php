@@ -98,7 +98,12 @@ class Users extends REST_Controller
                 $data = array(
                     'status' => 200,
                     "message" => "OTP verfied successfully.",
-                    "token" => $token
+                    "token" => $token,
+                    "user_id" => $user_id,
+                    "icon" => $user->icon,
+                    "ct_id" => $user->ct_id,
+                    "ct_name" => $user->ct_name,
+                    "profile_status" => $user->profile_status
                 );
                 $this->response($data, 200);
             } else {

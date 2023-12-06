@@ -42,6 +42,13 @@ class Common_api_model extends CI_Model
         return $record;
     }
 
+    function get_all_records($table, $condition)
+    {
+        $this->db->where($condition);
+        $record = $this->db->get($table)->result();
+        return $record;
+    }
+
     function get_user_data($user_id)
     {
         return $this->db->select('users.*, ctowns.ct_name')->from('users')->join('ctowns', 'ctowns.ct_id = users.ct_id', 'left')->where('users.user_id', $user_id)->limit(1)->get()->row();

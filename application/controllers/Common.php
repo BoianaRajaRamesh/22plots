@@ -258,4 +258,30 @@ class Common extends REST_Controller
             }
         }
     }
+
+    public function getLoactions_get()
+    {
+        $cond = "active_status = 'A'";
+        $records = $this->common_api_model->get_all_records("ctowns", $cond);
+
+        $data = array(
+            'status' => 200,
+            "message" => "Locations List.",
+            'list' => $records
+        );
+        $this->response($data, 201);
+    }
+
+    public function getAmenities_get()
+    {
+        $cond = "status = 1";
+        $records = $this->common_api_model->get_all_records("amenities", $cond);
+
+        $data = array(
+            'status' => 200,
+            "message" => "Locations List.",
+            'list' => $records
+        );
+        $this->response($data, 201);
+    }
 }

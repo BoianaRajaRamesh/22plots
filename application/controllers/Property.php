@@ -108,27 +108,47 @@ class Property extends REST_Controller
             'need_help' => $this->post('need_help'),
             'prop_status' => $this->post('prop_status'),
         ];
+
         foreach ($apartmentData as $field => $value) {
-            if ($field != 'total_area' && $field != 'cost_sheet' && $field != 'uds' && $field != 'distance_from_main_road' && $field != 'brochure') {
+            if ($field == 'prop_purpose' || $field == 'ct_id' || $field == 'area_name' || $field == 'user_type' || $field == 'property_name' || $field == 'address' || $field == 'facing' || $field == 'total_area' || $field == 'approvals') {
                 if (empty($value)) {
                     $this->throw_error("$field is required", 400);
                 }
             }
+        }
 
-            if ($field == 'govt_approval' || $field == 'contact_for_price' || $field == 'negotiable' || $field == 'brokerage' || $field == 'loan_availability' || $field == 'need_help') {
-                if (strtolower($value) != 'true' && strtolower($value) != 'false') {
-                    $this->throw_error("$field must be boolen", 400);
-                }
-                if (strtolower($value) == 'true') {
-                    $apartmentData[$field] = 1;
+        foreach ($apartmentData as $field => $value) {
+            if ($field == 'govt_approval' || $field == 'contact_for_price' || $field == 'negotiable' || $field == 'brokarage' || $field == 'loan_availability' || $field == 'need_help') {
+                if (!empty($value)) {
+                    if (strtolower($value) != 'true' && strtolower($value) != 'false') {
+                        $this->throw_error("$field must be boolen", 400);
+                    }
+                    if (strtolower($value) == 'true') {
+                        $apartmentData[$field] = 1;
+                    } else {
+                        $apartmentData[$field] = 0;
+                    }
                 } else {
                     $apartmentData[$field] = 0;
                 }
             }
         }
+
+        if ($apartmentData['contact_for_price'] == 0) {
+            if ($this->post('price_type') == 'range') {
+                if (empty($this->post('min_price')) || empty($this->post('max_price'))) {
+                    $this->throw_error('min_price and max_price are Required');
+                }
+            } else if ($this->post('price_type') == 'fixed') {
+                if (empty($this->post('fixed_price'))) {
+                    $this->throw_error('fixed_price Required');
+                }
+            }
+        }
+
         $flats_config = $this->post('flats_config');
         foreach ($flats_config as $key => $value) {
-            $requiredKeys = ['bhk_type', 'bathrooms', 'balcony'];
+            $requiredKeys = ['bhk_type', 'bathrooms', 'balcony', 'facing'];
             foreach ($requiredKeys as $key) {
                 if (empty($value[$key])) {
                     $this->throw_error(ucfirst($key) . " is required");
@@ -138,7 +158,7 @@ class Property extends REST_Controller
         if (isset($_FILES['banner_img']['name'])) {
             $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
-            $this->throw_error("banner image is required", 400);
+            $banner_img = "";
         }
         $apartmentData['added_on'] = CURRENT_DATE_TIME;
         $apartmentData['updated_on'] = CURRENT_DATE_TIME;
@@ -257,26 +277,45 @@ class Property extends REST_Controller
         ];
 
         foreach ($apartmentData as $field => $value) {
-            if ($field != 'total_area' && $field != 'cost_sheet' && $field != 'uds' && $field != 'distance_from_main_road' && $field != 'brochure') {
+            if ($field == 'prop_purpose' || $field == 'ct_id' || $field == 'area_name' || $field == 'user_type' || $field == 'property_name' || $field == 'address' || $field == 'facing') {
                 if (empty($value)) {
                     $this->throw_error("$field is required", 400);
                 }
             }
+        }
 
-            if ($field == 'govt_approval' || $field == 'contact_for_price' || $field == 'negotiable' || $field == 'brokerage' || $field == 'loan_availability' || $field == 'need_help') {
-                if (strtolower($value) != 'true' && strtolower($value) != 'false') {
-                    $this->throw_error("$field must be boolen", 400);
-                }
-                if (strtolower($value) == 'true') {
-                    $apartmentData[$field] = 1;
+        foreach ($apartmentData as $field => $value) {
+            if ($field == 'govt_approval' || $field == 'contact_for_price' || $field == 'negotiable' || $field == 'brokarage' || $field == 'loan_availability' || $field == 'need_help') {
+                if (!empty($value)) {
+                    if (strtolower($value) != 'true' && strtolower($value) != 'false') {
+                        $this->throw_error("$field must be boolen", 400);
+                    }
+                    if (strtolower($value) == 'true') {
+                        $apartmentData[$field] = 1;
+                    } else {
+                        $apartmentData[$field] = 0;
+                    }
                 } else {
                     $apartmentData[$field] = 0;
                 }
             }
         }
-        $flats_config = $this->post('flats_config');
+
+        if ($apartmentData['contact_for_price'] == 0) {
+            if ($this->post('price_type') == 'range') {
+                if (empty($this->post('min_price')) || empty($this->post('max_price'))) {
+                    $this->throw_error('min_price and max_price are Required');
+                }
+            } else if ($this->post('price_type') == 'fixed') {
+                if (empty($this->post('fixed_price'))) {
+                    $this->throw_error('fixed_price Required');
+                }
+            }
+        }
+
+        $flats_config = $this->post('house_config');
         foreach ($flats_config as $key => $value) {
-            $requiredKeys = ['bhk_type', 'bathrooms', 'balcony'];
+            $requiredKeys = ['bhk_type', 'bathrooms', 'balcony', 'facing'];
             foreach ($requiredKeys as $key) {
                 if (empty($value[$key])) {
                     $this->throw_error(ucfirst($key) . " is required");
@@ -286,7 +325,7 @@ class Property extends REST_Controller
         if (isset($_FILES['banner_img']['name'])) {
             $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
-            $this->throw_error("banner image is required", 400);
+            $banner_img = "";
         }
         $apartmentData['banner_img'] = $banner_img;
         $apartmentData['verification_status'] = 0;
@@ -394,7 +433,6 @@ class Property extends REST_Controller
             'amenities' => $this->post('amenities'),
             'video' => $this->post('video'),
             'comp_id' => $this->post('company_id'),
-            'no_of_floors' => $this->post('no_of_floors'),
             'msg' => $this->post('msg'),
             'need_help' => $this->post('need_help'),
             'prop_status' => $this->post('prop_status'),
@@ -403,20 +441,38 @@ class Property extends REST_Controller
         ];
 
         foreach ($apartmentData as $field => $value) {
-            if ($field != 'total_area' && $field != 'cost_sheet' && $field != 'distance_from_main_road' && $field != 'brochure') {
+            if ($field == 'prop_purpose' || $field == 'ct_id' || $field == 'area_name' || $field == 'user_type' || $field == 'property_name' || $field == 'address') {
                 if (empty($value)) {
                     $this->throw_error("$field is required", 400);
                 }
             }
+        }
 
-            if ($field == 'govt_approval' || $field == 'contact_for_price' || $field == 'negotiable' || $field == 'brokerage' || $field == 'loan_availability' || $field == 'need_help') {
-                if (strtolower($value) != 'true' && strtolower($value) != 'false') {
-                    $this->throw_error("$field must be boolen", 400);
-                }
-                if (strtolower($value) == 'true') {
-                    $apartmentData[$field] = 1;
+        foreach ($apartmentData as $field => $value) {
+            if ($field == 'govt_approval' || $field == 'contact_for_price' || $field == 'negotiable' || $field == 'brokarage' || $field == 'loan_availability' || $field == 'need_help') {
+                if (!empty($value)) {
+                    if (strtolower($value) != 'true' && strtolower($value) != 'false') {
+                        $this->throw_error("$field must be boolen", 400);
+                    }
+                    if (strtolower($value) == 'true') {
+                        $apartmentData[$field] = 1;
+                    } else {
+                        $apartmentData[$field] = 0;
+                    }
                 } else {
                     $apartmentData[$field] = 0;
+                }
+            }
+        }
+
+        if ($apartmentData['contact_for_price'] == 0) {
+            if ($this->post('price_type') == 'range') {
+                if (empty($this->post('min_price')) || empty($this->post('max_price'))) {
+                    $this->throw_error('min_price and max_price are Required');
+                }
+            } else if ($this->post('price_type') == 'fixed') {
+                if (empty($this->post('fixed_price'))) {
+                    $this->throw_error('fixed_price Required');
                 }
             }
         }
@@ -425,7 +481,7 @@ class Property extends REST_Controller
         if (isset($_FILES['banner_img']['name'])) {
             $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
-            $this->throw_error("banner image is required", 400);
+            $banner_img = "";
         }
         $apartmentData['banner_img'] = $banner_img;
         $apartmentData['verification_status'] = 0;
@@ -522,29 +578,50 @@ class Property extends REST_Controller
         ];
 
         foreach ($apartmentData as $field => $value) {
-            if ($field != 'distance_from_main_road') {
+            if ($field == 'prop_purpose' || $field == 'ct_id' || $field == 'area_name' || $field == 'user_type' || $field == 'property_name' || $field == 'address' || $field == 'description') {
                 if (empty($value)) {
                     $this->throw_error("$field is required", 400);
                 }
             }
+        }
 
-            if ($field == 'govt_approval' || $field == 'contact_for_price' || $field == 'negotiable' || $field == 'brokerage' || $field == 'loan_availability' || $field == 'need_help') {
-                if (strtolower($value) != 'true' && strtolower($value) != 'false') {
-                    $this->throw_error("$field must be boolen", 400);
-                }
-                if (strtolower($value) == 'true') {
-                    $apartmentData[$field] = 1;
+        foreach ($apartmentData as $field => $value) {
+            if ($field == 'govt_approval' || $field == 'contact_for_price' || $field == 'negotiable' || $field == 'brokarage' || $field == 'loan_availability' || $field == 'need_help') {
+                if (!empty($value)) {
+                    if (strtolower($value) != 'true' && strtolower($value) != 'false') {
+                        $this->throw_error("$field must be boolen", 400);
+                    }
+                    if (strtolower($value) == 'true') {
+                        $apartmentData[$field] = 1;
+                    } else {
+                        $apartmentData[$field] = 0;
+                    }
                 } else {
                     $apartmentData[$field] = 0;
                 }
             }
         }
-        $flats_config = $this->post('plots_config');
 
+        if ($apartmentData['contact_for_price'] == 0) {
+            if ($this->post('price_type') == 'range') {
+                if (empty($this->post('min_price')) || empty($this->post('max_price'))) {
+                    $this->throw_error('min_price and max_price are Required');
+                }
+            } else if ($this->post('price_type') == 'fixed') {
+                if (empty($this->post('fixed_price'))) {
+                    $this->throw_error('fixed_price Required');
+                }
+            }
+        }
+
+        $flats_config = $this->post('plots_config');
+        if (empty($flats_config)) {
+            $this->throw_error("plots config is required", 400);
+        }
         if (isset($_FILES['banner_img']['name'])) {
             $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
-            $this->throw_error("banner image is required", 400);
+            $banner_img = "";
         }
         $apartmentData['banner_img'] = $banner_img;
         $apartmentData['verification_status'] = 0;
@@ -628,7 +705,6 @@ class Property extends REST_Controller
             'longitude' => $this->post('longitude'),
             'location_advantages' => $this->post('location_advantages'),
             'amenities' => $this->post('amenities'),
-            'banner_img' => $this->post('banner_img'),
             'video' => $this->post('video'),
             'comp_id' => $this->post('company_id'),
             'msg' => $this->post('msg'),
@@ -639,27 +715,45 @@ class Property extends REST_Controller
         ];
 
         foreach ($apartmentData as $field => $value) {
-            if ($field != 'distance_from_main_road' && $field != 'comp_id' && $field != 'video') {
+            if ($field == 'prop_purpose' || $field == 'ct_id' || $field == 'area_name' || $field == 'user_type' || $field == 'property_name' || $field == 'address' || $field == 'description') {
                 if (empty($value)) {
                     $this->throw_error("$field is required", 400);
                 }
             }
+        }
 
-            if ($field == 'contact_for_price' || $field == 'negotiable' || $field == 'brokerage' || $field == 'loan_availability' || $field == 'need_help') {
-                if (strtolower($value) != 'true' && strtolower($value) != 'false') {
-                    $this->throw_error("$field must be boolen", 400);
-                }
-                if (strtolower($value) == 'true') {
-                    $apartmentData[$field] = 1;
+        foreach ($apartmentData as $field => $value) {
+            if ($field == 'contact_for_price' || $field == 'negotiable' || $field == 'brokarage' || $field == 'loan_availability' || $field == 'need_help') {
+                if (!empty($value)) {
+                    if (strtolower($value) != 'true' && strtolower($value) != 'false') {
+                        $this->throw_error("$field must be boolen", 400);
+                    }
+                    if (strtolower($value) == 'true') {
+                        $apartmentData[$field] = 1;
+                    } else {
+                        $apartmentData[$field] = 0;
+                    }
                 } else {
                     $apartmentData[$field] = 0;
+                }
+            }
+        }
+
+        if ($apartmentData['contact_for_price'] == 0) {
+            if ($this->post('price_type') == 'range') {
+                if (empty($this->post('min_price')) || empty($this->post('max_price'))) {
+                    $this->throw_error('min_price and max_price are Required');
+                }
+            } else if ($this->post('price_type') == 'fixed') {
+                if (empty($this->post('fixed_price'))) {
+                    $this->throw_error('fixed_price Required');
                 }
             }
         }
         if (isset($_FILES['banner_img']['name'])) {
             $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
-            $this->throw_error("banner image is required", 400);
+            $banner_img = "";
         }
         $apartmentData['banner_img'] = $banner_img;
         $apartmentData['verification_status'] = 0;
