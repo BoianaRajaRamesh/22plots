@@ -63,7 +63,10 @@ class Property extends REST_Controller
 
     public function saveApartment_post()
     {
-        $this->checkAuth();
+        if (empty($this->post('posted_by'))) {
+            $this->throw_error('posted_by Required');
+        }
+        $this->checkAuth($this->post('posted_by'));
 
         $apartmentData = [
             'posted_by' =>  $this->post('posted_by'),
@@ -104,8 +107,6 @@ class Property extends REST_Controller
             'msg' => $this->post('msg'),
             'need_help' => $this->post('need_help'),
             'prop_status' => $this->post('prop_status'),
-            'updated_on' => CURRENT_DATE_TIME,
-            'added_on' => CURRENT_DATE_TIME
         ];
         foreach ($apartmentData as $field => $value) {
             if ($field != 'total_area' && $field != 'cost_sheet' && $field != 'uds' && $field != 'distance_from_main_road' && $field != 'brochure') {
@@ -135,10 +136,12 @@ class Property extends REST_Controller
             }
         }
         if (isset($_FILES['banner_img']['name'])) {
-            $banner_img = $this->file_upload($_FILES['banner_img'], 'property_banner');
+            $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
-            $this->throw_error("$field is required", 400);
+            $this->throw_error("banner image is required", 400);
         }
+        $apartmentData['added_on'] = CURRENT_DATE_TIME;
+        $apartmentData['updated_on'] = CURRENT_DATE_TIME;
         $apartmentData['banner_img'] = $banner_img;
         $apartmentData['verification_status'] = 0;
         $apartmentData['property_type'] = 'APARTMENT';
@@ -151,7 +154,7 @@ class Property extends REST_Controller
             $image['size'] = $_FILES['photos']['size'][$i];
             $image['error'] = $_FILES['photos']['error'][$i];
 
-            $image_paths[] = $this->file_upload($image, 'properties');
+            $image_paths[] = $this->file_upload($image, PROPERTY_IMAGES);
         }
 
         $last_id = $this->common_api_model->add_data('properties', $apartmentData);
@@ -170,7 +173,7 @@ class Property extends REST_Controller
                     $file['tmp_name'] = $_FILES['floor_plan']['tmp_name'][$row['floor_plan']];
                     $file['error'] = $_FILES['floor_plan']['error'][$row['floor_plan']];
                     $file['size'] = $_FILES['floor_plan']['size'][$row['floor_plan']];
-                    $floor_plan = $this->file_upload($file, 'property_plan');
+                    $floor_plan = $this->file_upload($file, PROPERTY_FLOORPLAN);
                 } else {
                     $floor_plan = "";
                 }
@@ -205,7 +208,10 @@ class Property extends REST_Controller
 
     public function saveIndependentHouse_post()
     {
-        $this->checkAuth();
+        if (empty($this->post('posted_by'))) {
+            $this->throw_error('posted_by Required');
+        }
+        $this->checkAuth($this->post('posted_by'));
 
         $apartmentData = [
             'posted_by' => $this->post('posted_by'),
@@ -278,9 +284,9 @@ class Property extends REST_Controller
             }
         }
         if (isset($_FILES['banner_img']['name'])) {
-            $banner_img = $this->file_upload($_FILES['banner_img'], 'property_banner');
+            $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
-            $this->throw_error("$field is required", 400);
+            $this->throw_error("banner image is required", 400);
         }
         $apartmentData['banner_img'] = $banner_img;
         $apartmentData['verification_status'] = 0;
@@ -295,7 +301,7 @@ class Property extends REST_Controller
             $image['size'] = $_FILES['photos']['size'][$i];
             $image['error'] = $_FILES['photos']['error'][$i];
 
-            $image_paths[] = $this->file_upload($image, 'properties');
+            $image_paths[] = $this->file_upload($image, PROPERTY_IMAGES);
         }
 
         $last_id = $this->common_api_model->add_data('properties', $apartmentData);
@@ -314,7 +320,7 @@ class Property extends REST_Controller
                     $file['tmp_name'] = $_FILES['floor_plan']['tmp_name'][$row['floor_plan']];
                     $file['error'] = $_FILES['floor_plan']['error'][$row['floor_plan']];
                     $file['size'] = $_FILES['floor_plan']['size'][$row['floor_plan']];
-                    $floor_plan = $this->file_upload($file, 'property_plan');
+                    $floor_plan = $this->file_upload($file, PROPERTY_FLOORPLAN);
                 } else {
                     $floor_plan = "";
                 }
@@ -349,7 +355,10 @@ class Property extends REST_Controller
 
     public function saveVenture_post()
     {
-        $this->checkAuth();
+        if (empty($this->post('posted_by'))) {
+            $this->throw_error('posted_by Required');
+        }
+        $this->checkAuth($this->post('posted_by'));
 
         $apartmentData = [
             'posted_by' => $this->post('posted_by'),
@@ -414,9 +423,9 @@ class Property extends REST_Controller
         $flats_config = $this->post('plots_config');
 
         if (isset($_FILES['banner_img']['name'])) {
-            $banner_img = $this->file_upload($_FILES['banner_img'], 'property_banner');
+            $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
-            $this->throw_error("$field is required", 400);
+            $this->throw_error("banner image is required", 400);
         }
         $apartmentData['banner_img'] = $banner_img;
         $apartmentData['verification_status'] = 0;
@@ -431,7 +440,7 @@ class Property extends REST_Controller
             $image['size'] = $_FILES['photos']['size'][$i];
             $image['error'] = $_FILES['photos']['error'][$i];
 
-            $image_paths[] = $this->file_upload($image, 'properties');
+            $image_paths[] = $this->file_upload($image, PROPERTY_IMAGES);
         }
 
         $last_id = $this->common_api_model->add_data('properties', $apartmentData);
@@ -471,7 +480,10 @@ class Property extends REST_Controller
 
     public function saveIndependentPlot_post()
     {
-        $this->checkAuth();
+        if (empty($this->post('posted_by'))) {
+            $this->throw_error('posted_by Required');
+        }
+        $this->checkAuth($this->post('posted_by'));
 
         $apartmentData = [
             'posted_by' => $this->post('posted_by'),
@@ -530,9 +542,9 @@ class Property extends REST_Controller
         $flats_config = $this->post('plots_config');
 
         if (isset($_FILES['banner_img']['name'])) {
-            $banner_img = $this->file_upload($_FILES['banner_img'], 'property_banner');
+            $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
-            $this->throw_error("$field is required", 400);
+            $this->throw_error("banner image is required", 400);
         }
         $apartmentData['banner_img'] = $banner_img;
         $apartmentData['verification_status'] = 0;
@@ -547,7 +559,7 @@ class Property extends REST_Controller
             $image['size'] = $_FILES['photos']['size'][$i];
             $image['error'] = $_FILES['photos']['error'][$i];
 
-            $image_paths[] = $this->file_upload($image, 'properties');
+            $image_paths[] = $this->file_upload($image, PROPERTY_IMAGES);
         }
 
         $last_id = $this->common_api_model->add_data('properties', $apartmentData);
@@ -586,8 +598,10 @@ class Property extends REST_Controller
 
     public function saveLand_post()
     {
-        $this->checkAuth();
-
+        if (empty($this->post('posted_by'))) {
+            $this->throw_error('posted_by Required');
+        }
+        $this->checkAuth($this->post('posted_by'));
         $apartmentData = [
             'posted_by' => $this->post('posted_by'),
             'prop_purpose' => $this->post('prop_purpose'),
@@ -643,9 +657,9 @@ class Property extends REST_Controller
             }
         }
         if (isset($_FILES['banner_img']['name'])) {
-            $banner_img = $this->file_upload($_FILES['banner_img'], 'property_banner');
+            $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
-            $this->throw_error("$field is required", 400);
+            $this->throw_error("banner image is required", 400);
         }
         $apartmentData['banner_img'] = $banner_img;
         $apartmentData['verification_status'] = 0;
@@ -660,7 +674,7 @@ class Property extends REST_Controller
             $image['size'] = $_FILES['photos']['size'][$i];
             $image['error'] = $_FILES['photos']['error'][$i];
 
-            $image_paths[] = $this->file_upload($image, 'properties');
+            $image_paths[] = $this->file_upload($image, PROPERTY_IMAGES);
         }
 
         $last_id = $this->common_api_model->add_data('properties', $apartmentData);
@@ -753,8 +767,6 @@ class Property extends REST_Controller
         $property_type = $this->post('property_type');
         $property_id = $this->post('property_id');
         $properties = [];
-        // $sql = "select property_type, p.property_id, p.latitude, p.longitude, case when lower(p.price_type)='fixed' then p.fixed_price when lower(p.price_type)='range' then concat(p.min_price, '-', p.max_price) end as price from properties p where p.ct_id=$ct_id and p.prop_purpose='SELL' and p.prop_status='OPEN' and !(p.contact_for_price) and property_type like '%$property_type%'";
-        // $properties = $this->common_api_model->execute_raw_sql($sql);
         $data = array(
             'status' => 200,
             "message" => "Properties list.",

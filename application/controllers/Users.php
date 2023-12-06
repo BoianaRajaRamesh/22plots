@@ -77,19 +77,21 @@ class Users extends REST_Controller
 
     public function validateOtp_post()
     {
-        if (empty($this->post('phone_number'))) {
-            $this->throw_error('Phone Number Required');
+        if (empty($this->post('user_id'))) {
+            $this->throw_error('User id Required');
         }
         if (empty($this->post('otp'))) {
             $this->throw_error('OTP Required');
         }
-        $phone_number = $this->post('phone_number');
+        $user_id = $this->post('user_id');
         $otp = $this->post('otp');
-        $user = $this->users_model->getUserDetailsByPhone($phone_number);
+        // $user = $this->users_model->getUserDetailsByPhone($phone_number);
+        $user = $this->common_api_model->get_user_data($this->post('user_id'));
         $cdate = CURRENT_DATE_TIME;
         if ($cdate > $user->otp_valid_time) {
             $this->throw_error('OTP Expired', 401);
         }
+        $phone_number = $user->phone_number;
         if ($otp == $user->otp) {
             if ($this->users_model->update_user_otp_to_null($phone_number)) {
                 $token = $this->generateToken($user->user_id, $phone_number);
@@ -144,8 +146,12 @@ class Users extends REST_Controller
 
     public function updateUserDetails_post()
     {
-        $user_id = $this->checkAuth()['user_id'];
+        if (empty($this->post('user_id'))) {
+            $this->throw_error('User ID Required');
+        }
+        $user_id = $this->checkAuth($this->post('user_id'))['user_id'];
         $profile_data = [];
+
         if ($this->post('first_name')) {
             $profile_data['first_name'] = $this->post('first_name');
         }
@@ -184,6 +190,9 @@ class Users extends REST_Controller
                 $profile_data['wa_notifications'] = 0;
             }
         }
+        if (isset($_FILES['icon']['name'])) {
+            $profile_data['icon'] = $this->file_upload($_FILES['icon'], USERS_FOLDER);
+        }
         $profile_data['profile_status'] = 2;
         $profile_data['updated_on'] = CURRENT_DATE_TIME;
         $condition = "user_id = $user_id";
@@ -202,9 +211,12 @@ class Users extends REST_Controller
         }
     }
 
-    public function saveUserLog_get()
+    public function saveUserLog_post()
     {
-        $user_id = $this->checkAuth()['user_id'];
+        if (empty($this->post('user_id'))) {
+            $this->throw_error('User ID Required');
+        }
+        $user_id = $this->checkAuth($this->post('user_id'))['user_id'];
         $data = [
             'user_id' => $user_id,
             'visited_on' => CURRENT_DATE_TIME

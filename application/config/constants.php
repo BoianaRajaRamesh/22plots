@@ -95,3 +95,13 @@ define('CURRENT_DATE', date('Y-m-d'));
 define('OTP_VALUE', 123456);
 
 define('JWT_KEY', '#88RRPJ22PLOTS88#');
+
+define('USERS_FOLDER', 'users');
+define('DEVELOPER_FOUNDER', 'developer/founder');
+define('DEVELOPER_SALES_MANAGER', 'developer/sales_manager');
+define('PROPERTY_BROCHURE', 'property/brochure');
+define('PROPERTY_FLOORPLAN', 'property/floorplan');
+define('PROPERTY_BANNER', 'property/banner');
+define('PROPERTY_IMAGES', 'property/images');
+define('PROPERTY_COSTSHEET', 'property/costsheet');
+define('PROPERTY_ADDS', 'prop_adds');

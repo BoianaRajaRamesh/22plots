@@ -42,13 +42,14 @@ class Common extends REST_Controller
 
     public function myContactedProperties_post()
     {
-        $this->checkAuth();
-        if (empty($this->post('ct_id'))) {
-            $this->throw_error('ct id Required');
+        if (empty($this->post('user_id'))) {
+            $this->throw_error('User ID Required');
         }
-        $ct_id = $this->post('ct_id');
+        $this->checkAuth($this->post('user_id'));
 
-        $sql = "Select p.property_id, p.banner_img, p.property_name, p.property_type, p.area_name, p.ct_id, ct.ct_name, case when p.contact_for_price then 'contact for price' when lower(p.price_type)='fixed' then p.fixed_price when lower(p.price_type)='range' then concat(p.min_price, 'to', p.max_price) else 'contact for price' end as price, p.brokarage, p.prop_status, case when p.property_type='APARTMENT' then c1.apartment_config when p.property_type like '%HOUSE%' then c1.house_config else 'NA' end as config, ch.called_on from properties p inner join call_history ch on ch.user_id=$ct_id and p.property_id=ch.property_id inner join ctowns as ct on p.ct_id=ct.ct_id left join (select property_id, concat(group_concat(bhk_type), ' BHK Apartments') as apartment_config, concat(bhk_type, ' Bed | ', bathrooms, ' Bath | ', case when super_builtup_area is not null then super_builtup_area when builtup_area is not null then builtup_area when carpet_area is not null then carpet_area else 'NA' end) as house_config from flats_config group by property_id) as c1 on p.property_id=c1.property_id";
+        $user_id = $this->post('user_id');
+
+        $sql = "Select p.property_id, p.banner_img, p.property_name, p.property_type, p.area_name, p.ct_id, ct.ct_name, case when p.contact_for_price then 'contact for price' when lower(p.price_type)='fixed' then p.fixed_price when lower(p.price_type)='range' then concat(p.min_price, 'to', p.max_price) else 'contact for price' end as price, p.brokarage, p.prop_status, case when p.property_type='APARTMENT' then c1.apartment_config when p.property_type like '%HOUSE%' then c1.house_config else 'NA' end as config, ch.called_on from properties p inner join call_history ch on ch.user_id=$user_id and p.property_id=ch.property_id inner join ctowns as ct on p.ct_id=ct.ct_id left join (select property_id, concat(group_concat(bhk_type), ' BHK Apartments') as apartment_config, concat(bhk_type, ' Bed | ', bathrooms, ' Bath | ', case when super_builtup_area is not null then super_builtup_area when builtup_area is not null then builtup_area when carpet_area is not null then carpet_area else 'NA' end) as house_config from flats_config group by property_id) as c1 on p.property_id=c1.property_id";
         $data1 = $this->common_api_model->execute_raw_sql($sql);
 
         $data = array(
@@ -59,9 +60,12 @@ class Common extends REST_Controller
         $this->response($data, 200);
     }
 
-    public function viewedProperties_get()
+    public function viewedProperties_post()
     {
-        $user_id = $this->checkAuth()['user_id'];
+        if (empty($this->post('user_id'))) {
+            $this->throw_error('User id Required');
+        }
+        $user_id = $this->checkAuth($this->post('user_id'))['user_id'];
 
         $sql = "Select p.property_id, p.banner_img, p.property_name, p.property_type, p.area_name, p.ct_id, ct.ct_name, case when p.contact_for_price then 'contact for price' when lower(p.price_type)='fixed' then p.fixed_price when lower(p.price_type)='range' then concat(p.min_price, 'to', p.max_price) else 'contact for price' end as price, p.brokarage, p.prop_status, case when p.property_type='APARTMENT' then c1.apartment_config when p.property_type like '%HOUSE%' then c1.house_config else 'NA' end as config, pv.viewed_on from properties p inner join property_views pv on pv.user_id=$user_id and p.property_id=pv.property_id inner join ctowns as ct on p.ct_id=ct.ct_id left join (select property_id, concat(group_concat(bhk_type), ' BHK Apartments') as apartment_config, concat(bhk_type, ' Bed | ', bathrooms, ' Bath | ', case when super_builtup_area is not null then super_builtup_area when builtup_area is not null then builtup_area when carpet_area is not null then carpet_area else 'NA' end) as house_config from flats_config group by property_id) as c1 on p.property_id=c1.property_id";
         $data1 = $this->common_api_model->execute_raw_sql($sql);
@@ -74,9 +78,12 @@ class Common extends REST_Controller
         $this->response($data, 200);
     }
 
-    public function wishlist_get()
+    public function wishlist_post()
     {
-        $user_id = $this->checkAuth()['user_id'];
+        if (empty($this->post('user_id'))) {
+            $this->throw_error('User id Required');
+        }
+        $user_id = $this->checkAuth($this->post('user_id'))['user_id'];
 
         $sql = "Select p.property_id, p.banner_img, p.property_name, p.property_type, p.area_name, p.ct_id, ct.ct_name, case when p.contact_for_price then 'contact for price' when lower(p.price_type)='fixed' then p.fixed_price when lower(p.price_type)='range' then concat(p.min_price, 'to', p.max_price) else 'contact for price' end as price, p.brokarage, p.prop_status, case when p.property_type='APARTMENT' then c1.apartment_config when p.property_type like '%HOUSE%' then c1.house_config else 'NA' end as config, pw.wishlisted_on from properties p inner join prop_wishlist pw on pw.user_id=$user_id and p.property_id=pw.property_id inner join ctowns as ct on p.ct_id=ct.ct_id left join (select property_id, concat(group_concat(bhk_type), ' BHK Apartments') as apartment_config, concat(bhk_type, ' Bed | ', bathrooms, ' Bath | ', case when super_builtup_area is not null then super_builtup_area when builtup_area is not null then builtup_area when carpet_area is not null then carpet_area else 'NA' end) as house_config from flats_config group by property_id) as c1 on p.property_id=c1.property_id";
         $data1 = $this->common_api_model->execute_raw_sql($sql);
@@ -89,9 +96,12 @@ class Common extends REST_Controller
         $this->response($data, 200);
     }
 
-    public function myProperties_get()
+    public function myProperties_post()
     {
-        $user_id = $this->checkAuth()['user_id'];
+        if (empty($this->post('user_id'))) {
+            $this->throw_error('User id Required');
+        }
+        $user_id = $this->checkAuth($this->post('user_id'))['user_id'];
 
         $sql = "Select p.property_id, p.banner_img, p.property_name, p.property_type, p.area_name, p.ct_id, ct.ct_name, case when p.contact_for_price then 'contact for price' when lower(p.price_type)='fixed' then p.fixed_price when lower(p.price_type)='range' then concat(p.min_price, 'to', p.max_price) else 'contact for price' end as price, p.brokarage, p.prop_status, case when p.property_type='APARTMENT' then c1.apartment_config when p.property_type like '%HOUSE%' then c1.house_config else 'NA' end as config from properties p inner join ctowns as ct on p.posted_by=$user_id and p.ct_id=ct.ct_id left join (select property_id, concat(group_concat(bhk_type), ' BHK Apartments') as apartment_config, concat(bhk_type, ' Bed | ', bathrooms, ' Bath | ', case when super_builtup_area is not null then super_builtup_area when builtup_area is not null then builtup_area when carpet_area is not null then carpet_area else 'NA' end) as house_config from flats_config group by property_id) as c1 on p.property_id=c1.property_id";
         $data1 = $this->common_api_model->execute_raw_sql($sql);
@@ -123,7 +133,10 @@ class Common extends REST_Controller
 
     public function addToWishlist_post()
     {
-        $user_id = $this->checkAuth()['user_id'];
+        if (empty($this->post('user_id'))) {
+            $this->throw_error('User id Required');
+        }
+        $user_id = $this->checkAuth($this->post('user_id'))['user_id'];
         if (empty($this->post('property_id'))) {
             $this->throw_error('property id required');
         }
@@ -166,7 +179,10 @@ class Common extends REST_Controller
 
     public function savePropertyView_post()
     {
-        $user_id = $this->checkAuth()['user_id'];
+        if (empty($this->post('user_id'))) {
+            $this->throw_error('User id Required');
+        }
+        $user_id = $this->checkAuth($this->post('user_id'))['user_id'];
         if (empty($this->post('property_id'))) {
             $this->throw_error('property id required');
         }
@@ -204,7 +220,10 @@ class Common extends REST_Controller
 
     public function savePropertyCallHistory_post()
     {
-        $user_id = $this->checkAuth()['user_id'];
+        if (empty($this->post('user_id'))) {
+            $this->throw_error('User id Required');
+        }
+        $user_id = $this->checkAuth($this->post('user_id'))['user_id'];
         if (empty($this->post('property_id'))) {
             $this->throw_error('property id required');
         }

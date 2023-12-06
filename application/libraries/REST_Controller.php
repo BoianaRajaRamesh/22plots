@@ -2164,7 +2164,7 @@ abstract class REST_Controller extends \CI_Controller
         }
     }
 
-    function checkAuth()
+    function checkAuth($userID = '')
     {
         if ($this->input->get_request_header('Authorization')) {
             // Get the token from the Authorization header
@@ -2174,7 +2174,13 @@ abstract class REST_Controller extends \CI_Controller
             list($tokenType, $token) = explode(' ', $authorizationHeader);
 
             if ($tokenType === 'Bearer') {
-                return $this->validateToken($token);
+                $arr = $this->validateToken($token);
+                if (!empty($userID)) {
+                    if ($arr['user_id'] != $userID) {
+                        $this->throw_error('Token and user id not matching', 401);
+                    }
+                }
+                return $arr;
             } else {
                 $this->throw_error('Invalid token type', 401);
             }
@@ -2220,9 +2226,9 @@ abstract class REST_Controller extends \CI_Controller
         $_FILES['file']['size'] = $file['size'];
         $_FILES['file']['error'] = $file['error'];
         if (!empty($folder_name)) {
-            $path = 'uploads/' . trim($folder_name) . '/';
+            $path = 'assets/images/' . trim($folder_name) . '/';
         } else {
-            $path = 'uploads/';
+            $path = 'assets/images/';
         }
         if (!is_dir($path)) {
             mkdir($path, 0777, true);
