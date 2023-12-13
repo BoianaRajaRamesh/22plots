@@ -855,16 +855,43 @@ class Property extends REST_Controller
         if (empty($this->post('property_id'))) {
             $this->throw_error('property id required');
         }
-        if (empty($this->post('property_type'))) {
-            $this->throw_error('property type required');
+        $id = $this->post('property_id');
+        $cond = "property_id = $id";
+        $row = $this->common_api_model->get_record("properties", $cond);
+        if ($row->comp_id != 0) {
+            $company_details = $this->common_api_model->get_record("company_info", 'id = ' . $row->comp_id);
+            $row->seller_name = $company_details->sales_name;
+            $row->phone_number = $company_details->sales_number;
+            $row->profession = "sales";
+            $row->company_name  = $company_details->name;
+            $row->company_type   = $company_details->type;
+        } else {
+            $user_details = $this->common_api_model->get_record("users", 'user_id = ' . $row->posted_by);
+            $row->seller_name = $user_details->first_name . ' ' . $user_details->last_name;
+            $row->phone_number = $user_details->phone_number;
+            $row->profession = $user_details->profession;
+            $row->company_name  = "";
+            $row->company_type   = "";
         }
-        $property_type = $this->post('property_type');
-        $property_id = $this->post('property_id');
-        $properties = [];
+        $row->company_id = $row->comp_id;
+        unset($row->comp_id);
+        $row->photos  = $this->common_api_model->get_records_with_selected_columns("property_images", 'image_url', 'property_id = ' . $row->property_id);
+        $row->flats_config = [];
+        $row->house_config = [];
+        $row->plots_config = [];
+        if ($row->property_type == 'APARTMENT') {
+            $row->flats_config = $this->common_api_model->get_records_with_selected_columns("flats_config", 'property_id, bhk_type, floor_num, facing, bathrooms, balcony, super_builtup_area, builtup_area, carpet_area, floor_plan, price', 'property_id = ' . $row->property_id);
+        }
+        if ($row->property_type == 'HOUSE') {
+            $row->house_config = $this->common_api_model->get_records_with_selected_columns("flats_config", 'property_id, bhk_type, floor_num, facing, bathrooms, balcony, super_builtup_area, builtup_area, carpet_area, floor_plan, price', 'property_id = ' . $row->property_id);
+        }
+        if ($row->property_type == 'VENTURE' || $row->property_type == 'PLOT') {
+            $row->plots_config = $this->common_api_model->get_records_with_selected_columns("plots_config", 'property_id, width, length, facing, square_yards, price', 'property_id = ' . $row->property_id);
+        }
         $data = array(
             'status' => 200,
-            "message" => "Properties list.",
-            'properties' => $properties
+            "message" => "Property details.",
+            'property_details' => $row
         );
         $this->response($data, 200);
     }
