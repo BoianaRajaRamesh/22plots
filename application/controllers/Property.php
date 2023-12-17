@@ -860,18 +860,27 @@ class Property extends REST_Controller
         $row = $this->common_api_model->get_record("properties", $cond);
         if ($row->comp_id != 0) {
             $company_details = $this->common_api_model->get_record("company_info", 'id = ' . $row->comp_id);
-            $row->seller_name = $company_details->sales_name;
-            $row->phone_number = $company_details->sales_number;
-            $row->profession = "sales";
-            $row->company_name  = $company_details->name;
-            $row->company_type   = $company_details->type;
+            if (!empty($company_details)) {
+                $row->seller_name = $company_details->sales_name;
+                $row->phone_number = $company_details->sales_number;
+                $row->profession = "sales";
+                $row->company_name  = $company_details->name;
+                $row->company_type   = $company_details->type;
+            } else {
+                $row->seller_name = $row->phone_number = $row->company_name  = $row->company_type   = "";
+                $row->profession = "sales";;
+            }
         } else {
             $user_details = $this->common_api_model->get_record("users", 'user_id = ' . $row->posted_by);
-            $row->seller_name = $user_details->first_name . ' ' . $user_details->last_name;
-            $row->phone_number = $user_details->phone_number;
-            $row->profession = $user_details->profession;
-            $row->company_name  = "";
-            $row->company_type   = "";
+            if (!empty($user_details)) {
+                $row->seller_name = $user_details->first_name . ' ' . $user_details->last_name;
+                $row->phone_number = $user_details->phone_number;
+                $row->profession = $user_details->profession;
+                $row->company_name  = "";
+                $row->company_type   = "";
+            } else {
+                $row->seller_name = $row->phone_number = $row->profession = $row->company_name  =  $row->company_type   = "";
+            }
         }
         $row->company_id = $row->comp_id;
         unset($row->comp_id);

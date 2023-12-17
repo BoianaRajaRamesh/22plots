@@ -39,7 +39,11 @@ class Common_api_model extends CI_Model
     {
         $this->db->where($condition);
         $record = $this->db->get($table)->row();
-        return $record;
+        if ($record) {
+            return $record;
+        } else {
+            return "";
+        }
     }
 
     function get_all_records($table, $condition)

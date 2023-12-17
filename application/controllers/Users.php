@@ -195,7 +195,7 @@ class Users extends REST_Controller
                 $profile_data['wa_notifications'] = 0;
             }
         }
-        if (isset($_FILES['icon']['name'])) {
+        if ($_FILES['icon']['name'] != '') {
             $profile_data['icon'] = $this->file_upload($_FILES['icon'], USERS_FOLDER);
         }
         $profile_data['profile_status'] = 2;

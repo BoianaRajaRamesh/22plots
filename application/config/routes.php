@@ -76,7 +76,7 @@ $route['admin'] = 'admin/login';
 // $route['propertyDetailsById'] = 'property/propertyDetailsById';
 
 
-$route['user/create'] = 'users';
+$route['user/login'] = 'users';
 $route['resend-otp'] = 'users/resendOtp';
 $route['validate-otp'] = 'users/validateOtp';
 $route['user/get-details'] = 'users/userDetails';
@@ -93,6 +93,7 @@ $route['developer-profile'] = 'common/developerProfile';
 $route['save-call-history'] = 'common/savePropertyCallHistory';
 $route['get-loactions'] = 'common/getLoactions';
 $route['get-amenities'] = 'common/getAmenities';
+$route['save-prop-requirement'] = 'common/savePropertyRequirement';
 $route['search-property'] = 'property/searchProperty';
 $route['save-apartment'] = 'property/saveApartment';
 $route['save-independent-house'] = 'property/saveIndependentHouse';
@@ -100,7 +101,7 @@ $route['save-venture'] = 'property/saveVenture';
 $route['save-independent-plot'] = 'property/saveIndependentPlot';
 $route['save-land'] = 'property/saveLand';
 $route['update-property-status'] = 'property/updatePropertyStatus';
-$route['get-property-details-by-ct'] = 'property/propertyDetailsByCt';
+$route['properties/map-search'] = 'property/propertyDetailsByCt';
 $route['get-property-details-by-id'] = 'property/propertyDetailsById';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
