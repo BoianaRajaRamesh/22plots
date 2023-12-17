@@ -93,7 +93,7 @@ class Property extends REST_Controller
             'negotiable' => $this->post('negotiable'),
             'brokarage' => $this->post('brokerage'),
             'loan_availability' => $this->post('loan_availability'),
-            'cost_sheet' => $this->post('cost_sheet'),
+            // 'cost_sheet' => $this->post('cost_sheet'),
             'uds' => $this->post('uds'),
             'distance_from_main_road' => $this->post('distance_from_main_road'),
             'latitude' => $this->post('latitude'),
@@ -155,11 +155,19 @@ class Property extends REST_Controller
                 }
             }
         }
-        if (isset($_FILES['banner_img']['name'])) {
+        if ($_FILES['banner_img']['name'] != '') {
             $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
             $banner_img = "";
         }
+
+        if ($_FILES['cost_sheet']['name'] != '') {
+            $cost_sheet = $this->file_upload($_FILES['cost_sheet'], PROPERTY_COSTSHEET, 'pdf');
+        } else {
+            $cost_sheet = "";
+        }
+
+        $apartmentData['cost_sheet'] = $cost_sheet;
         $apartmentData['added_on'] = CURRENT_DATE_TIME;
         $apartmentData['updated_on'] = CURRENT_DATE_TIME;
         $apartmentData['banner_img'] = $banner_img;
@@ -258,7 +266,7 @@ class Property extends REST_Controller
             'negotiable' => $this->post('negotiable'),
             'brokarage' => $this->post('brokerage'),
             'loan_availability' => $this->post('loan_availability'),
-            'cost_sheet' => $this->post('cost_sheet'),
+            // 'cost_sheet' => $this->post('cost_sheet'),
             'uds' => $this->post('uds'),
             'distance_from_main_road' => $this->post('distance_from_main_road'),
             'latitude' => $this->post('latitude'),
@@ -322,11 +330,18 @@ class Property extends REST_Controller
                 }
             }
         }
-        if (isset($_FILES['banner_img']['name'])) {
+        if ($_FILES['banner_img']['name'] != '') {
             $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
             $banner_img = "";
         }
+        if ($_FILES['cost_sheet']['name'] != '') {
+            $cost_sheet = $this->file_upload($_FILES['cost_sheet'], PROPERTY_COSTSHEET, 'pdf');
+        } else {
+            $cost_sheet = "";
+        }
+
+        $apartmentData['cost_sheet'] = $cost_sheet;
         $apartmentData['banner_img'] = $banner_img;
         $apartmentData['verification_status'] = 0;
         $apartmentData['property_type'] = 'HOUSE';
@@ -424,7 +439,7 @@ class Property extends REST_Controller
             'negotiable' => $this->post('negotiable'),
             'brokarage' => $this->post('brokerage'),
             'loan_availability' => $this->post('loan_availability'),
-            'cost_sheet' => $this->post('cost_sheet'),
+            // 'cost_sheet' => $this->post('cost_sheet'),
             'distance_from_main_road' => $this->post('distance_from_main_road'),
             'latitude' => $this->post('latitude'),
             'longitude' => $this->post('longitude'),
@@ -478,11 +493,18 @@ class Property extends REST_Controller
         }
         $flats_config = $this->post('plots_config');
 
-        if (isset($_FILES['banner_img']['name'])) {
+        if ($_FILES['banner_img']['name'] != '') {
             $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
             $banner_img = "";
         }
+        if ($_FILES['cost_sheet']['name'] != '') {
+            $cost_sheet = $this->file_upload($_FILES['cost_sheet'], PROPERTY_COSTSHEET, 'pdf');
+        } else {
+            $cost_sheet = "";
+        }
+
+        $apartmentData['cost_sheet'] = $cost_sheet;
         $apartmentData['banner_img'] = $banner_img;
         $apartmentData['verification_status'] = 0;
         $apartmentData['property_type'] = 'VENTURE';
@@ -618,7 +640,7 @@ class Property extends REST_Controller
         if (empty($flats_config)) {
             $this->throw_error("plots config is required", 400);
         }
-        if (isset($_FILES['banner_img']['name'])) {
+        if ($_FILES['banner_img']['name'] != '') {
             $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
             $banner_img = "";
@@ -750,7 +772,7 @@ class Property extends REST_Controller
                 }
             }
         }
-        if (isset($_FILES['banner_img']['name'])) {
+        if ($_FILES['banner_img']['name'] != '') {
             $banner_img = $this->file_upload($_FILES['banner_img'], PROPERTY_BANNER);
         } else {
             $banner_img = "";

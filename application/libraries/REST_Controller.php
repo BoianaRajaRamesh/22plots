@@ -2218,7 +2218,7 @@ abstract class REST_Controller extends \CI_Controller
         return $data;
     }
 
-    public function file_upload($file, $folder_name = '')
+    public function file_upload($file, $folder_name = '', $allowed_types = "")
     {
         $_FILES['file']['name'] = $file['name'];
         $_FILES['file']['type'] = $file['type'];
@@ -2234,7 +2234,11 @@ abstract class REST_Controller extends \CI_Controller
             mkdir($path, 0777, true);
         }
         $config['upload_path'] = $path;
-        $config['allowed_types'] = 'jpg|png|pdf|svg|jpeg';
+        if ($allowed_types == '') {
+            $config['allowed_types'] = 'jpg|png|pdf|svg|jpeg';
+        } else {
+            $config['allowed_types'] = $allowed_types;
+        }
         $config['max_size'] = 10200;
         $config['max_width'] = 0;
         $config['max_height'] = 0;
@@ -2248,7 +2252,7 @@ abstract class REST_Controller extends \CI_Controller
             $err = $this->upload->display_errors();
             unset($this->upload);
             $data = array(
-                'status' => "invalid",
+                'status' => 400,
                 "message" => $err,
                 "data" => array(),
             );
